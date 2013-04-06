@@ -6,44 +6,51 @@
 #include "GoalFunction.h"
 using namespace std;
 
+//
+// Class that implements Simulated Annealing algorithm
+// and find the min of any given IGoalFunction
+//
 class CAnnealer{
 private:
-	
-	IGoalFunction *function;
+	 // ptr to IGoalFunction to find minimum
+	 IGoalFunction *function;
 
-	 // Размерность пространства (кол-во переменных)
+	 // Space dimension count (the number of variables in function)
 	 int D;
+	 // Vector of variable values, which represents the point of minimum 
 	 vector<double> A;
-	 // Вектор параметров системы (переменных)
+	 // Vector of current variable values, and offered values for next step
 	 vector<double> X, nextX;
-	 // Вектор ограничений
+	 // Vector of constraits
 	 vector<pair<double, double> > constraits;
-	  // Вектор шагов для каждой из переменных
+	  // Vector of maximum possible delta for each variable
 	 vector<double> V;
-	 // Энергия: текущая, на след. шаге, минимальня
+	 // "Energy"(Min of function): current, on the next step, global minimum of energy
 	 double currentE, nextE, minE;
-	 // Температура
+	 // "Temperature": current, origin
 	 double t, originT;
-	 // Случайная величина с равномерным распределением
+	 // Randomly distributed variable (0..1)
 	 double alpha;
 	 
+	 // Default constraits
 	 double default_low_bound, default_high_bound;
 	 double annealStep;
 
-	 // Шаг алгоритма
+	 // To eliminate algorithm:
 	 int maxSteps;
 	 int maxStepsPerGeneration;
 	 double minTemperature;
 
-	 // Сгенерировать случайную величину на [-1,1] с распределением Коши
+	 // Generate random variable on [-1,1] with Cauchi distribution
 	 double rand_cauchi(double t);
 
-	 // Сгенерировать новую точку
+	 // Generate new state
 	 void Generate(const vector<double> &X, vector<double> &nextX, double t);
-
+	 
+	 // Probablistic parameter
 	 double h(double dE, double t);
 
-	 // Закон изменения температуры (по Коши)
+	 // Law of temperature decreasing from step number
 	 double T(int k);
 
 public:
