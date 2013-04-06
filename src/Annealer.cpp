@@ -9,8 +9,7 @@
 using namespace std;
 
 CAnnealer::CAnnealer(){
-	// Для всех этих параметров отжига будут функции, которые будут из задавать.
-	// (пока эти параметры прописаны вручную)
+	// TODO: write functions to set this parameters manualy
 	default_low_bound = -1e30;
 	default_high_bound = 1e30;
 	minTemperature = 1e-30;
@@ -22,20 +21,27 @@ CAnnealer::CAnnealer(){
 
 void CAnnealer::setGoalFunction(IGoalFunction *f){
 	function = f;
+	
+	// Get dimensions count
 	D = function->getVariablesCount();
 
+	// Apply default constraits
 	for(int i = 0; i < D; i++)
 		constraits.push_back(make_pair(default_low_bound, default_high_bound));
 
+	// Set initial state to random possible state
 	A = vector<double>(D,0);
 	X = vector<double>(D, ((rand()%2==0)?-1:1)*min(fabs(default_high_bound),fabs(default_low_bound))*rand()/ RAND_MAX);
 	nextX = vector<double>(D, 0);
 	V = vector<double>(D, annealStep );
+	
+	// Calc curretn energy
 	currentE = function->evaluate(X);
 	minE = currentE;
 	A = X;
 }
 
+// Get random variable with Cauchi distribution on [-1,1]
 double CAnnealer::rand_cauchi(double t){
 	double a = double( rand() ) / RAND_MAX;
 	return t*tan(M_PI*a - M_PI/2.0);
@@ -58,6 +64,7 @@ double CAnnealer::T(int k){
 	return originT / pow(double(k), double(1)/D);
 }
 
+// Simulating of Annealing
 void CAnnealer::minimize(){
 	srand(clock());
 
@@ -73,6 +80,7 @@ void CAnnealer::minimize(){
 		}
 		steps = 0;
 		while(1){
+			if(steps > maxStepsPerGeneration) break;
 			Generate(X, nextX, t);
 			
 			nextE = function->evaluate(nextX);
@@ -107,7 +115,7 @@ void CAnnealer::setCondition(string varName, double low, double high){
 		constraits[n] = make_pair(low, high);
 		X[n] = ((rand()%2==0)?-1:1)*min(fabs(low), fabs(high))*(double(rand())/ RAND_MAX);
 	}catch(UserException e){
-		throw UserException("Не могу установить ограничение на переменную.");
+		throw UserException("Can't put constrait on variable (maybe you made a typo in var name?)");
 	}
 }
 
