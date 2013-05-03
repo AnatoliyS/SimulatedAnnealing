@@ -1,12 +1,14 @@
 #pragma once
 #define _USE_MATH_DEFINES
-#include "Annealer.h"
-#include "GoalFunction.h"
-#include "ErrorHandler.h"
 #include <limits.h>
 #include <cstdlib>
 #include <cmath>
+
+#include "Annealer.h"
+#include "GoalFunction.h"
+#include "ErrorHandler.h"
 using namespace std;
+
 
 CAnnealer::CAnnealer(){
 	// TODO: write functions to set this parameters manualy

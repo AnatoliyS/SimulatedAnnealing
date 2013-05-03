@@ -12,19 +12,33 @@ double CTreeGoalFunction::evaluate(const vector<double> &x) const{
 	return root->get_value(x);
 }
 
+// Recursively build a tree of operations form string. We consider [left, right] substring
+// and scan it level by level.
+// @param 's': string with the function;
+// @param 'level': Level of scaning. Can be {1,2,3}. 1 means current area should be considered 
+// to have +\- as last operation here. 2 for *,\ and 3 for unaru operations.
+// @param 'left': left index of area in the string, which we consider now
+// @param 'right': right index of area in the string, which we consider now
+// Return: pointer to the root of a tree
 AbstractTreeNode* CTreeGoalFunction::build(string &s, int level, int left, int right){
 	if(left > right ) 
-		return NULL;
+		return NULL; // This area is empty
 
+	// Node to represent current part of the string
 	AbstractTreeNode* current;
 
+	// Current depth of brakets
 	int braket_depth = 0;
 	bool any = false;
 
+	// If current part of a string is name (treate it as new variable)
 	bool isname = true;
+	// If curretn part of the string is number
 	bool isnumber = true;
+	// Position of floating point (if has one)
 	int floating_point = -1;
 	
+	// Check if curetna area is number or var name:
 	for(int i = left; i <= right && (isname || isnumber); i++){
 		if(isname && !isalpha(s[i])){
 			isname = false;
@@ -38,19 +52,28 @@ AbstractTreeNode* CTreeGoalFunction::build(string &s, int level, int left, int r
 	}
 	if(isname){
 		string varName = s.substr(left, right - left + 1);
+		
 		if(varNumbers.find(varName) == varNumbers.end()){
+			// If this name appears at first
 			varNames.push_back(varName);
 			varNumbers.insert(make_pair(varNames[varNames.size()-1], varNames.size()-1));
 			current = new CTreeNodeVariable(varNames.size()-1);
 		}else{
+			// We already have such name
 			current = new CTreeNodeVariable(varNumbers[varName]);
 		}
 		
+		// This node is a leaf, so simply return it
 		return current;
 	}
+
+
 	if(isnumber){
+		// Store value in temp
 		double temp = 0;
+		// Current radix
 		double base = 1;
+
 		if(floating_point == -1){
 			for(int i = right; i >= left; i--){
 				temp += (s[i]-'0')*base;
@@ -69,13 +92,18 @@ AbstractTreeNode* CTreeGoalFunction::build(string &s, int level, int left, int r
 			}
 		}
 		current = new CTreeNodeConstant(temp);
+
+		// This node is a leaf, so simply return it
 		return current;
 	}
 
 	switch(level){
-		 case 1:
+		 case 1: 
+			 // Try to find +\- operation, and check whether it is last operation 
+			 // here (braket_depth == 0)
 			 for(int i = right; i >= left; i--){
 				 if((s[i] == '+' || s[i] == '-') && !braket_depth){
+					 // Recursively build binary operation node
 					 current = new CTreeNodeBinaryOperation(
 						 ((s[i] == '+')? CTreeNodeBinaryOperation::BinaryOperation::Plus
 									  : CTreeNodeBinaryOperation::BinaryOperation::Minus),
@@ -87,6 +115,8 @@ AbstractTreeNode* CTreeGoalFunction::build(string &s, int level, int left, int r
 				 if(s[i] == '(') braket_depth++;
 				 if(s[i] == ')') braket_depth--;
 			 }
+
+			 // If we haven't find any last +\- operation here, scan with next level
 			 if(!any)
 				 build(s,2,left,right);
 			 else

@@ -6,10 +6,10 @@
 #include "GoalFunction.h"
 using namespace std;
 
-//
-// Class that implements Simulated Annealing algorithm
-// and find the min of any given IGoalFunction
-//
+///
+/// Class that implements Simulated Annealing algorithm
+/// and find the min of any given IGoalFunction
+///
 class CAnnealer{
 private:
 	 // ptr to IGoalFunction to find minimum

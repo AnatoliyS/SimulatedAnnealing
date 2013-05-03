@@ -5,15 +5,22 @@
 #include<map>
 using namespace std;
 
-// Не интерфейс, а просто класс
+///
+/// Class for basic tree node
+///
 class AbstractTreeNode{
 protected:
 	AbstractTreeNode *left, *right;
 public:
+	// Calc value in this node
 	double virtual get_value(const vector<double> &x) =0;
+	// For debug
 	void virtual print(int) =0;
 };
 
+///
+/// Class for binary operation
+///
 class CTreeNodeBinaryOperation: public AbstractTreeNode{
 public:
 	static enum BinaryOperation{
@@ -27,6 +34,9 @@ public:
 	void print(int level);
 };
 
+///
+/// Class for unary operation (right always points to NULL)
+///
 class CTreeNodeUnaryOperation: public AbstractTreeNode{
 public:
 	static enum UnaryOperation{
@@ -40,7 +50,9 @@ public:
 	void print(int level);
 };
 
-
+///
+/// Class for constant value
+///
 class CTreeNodeConstant: public AbstractTreeNode{
 private:
 	double value;
@@ -50,6 +62,9 @@ public:
 	void print(int level);
 };
 
+///
+/// Class for variable
+///
 class CTreeNodeVariable: public AbstractTreeNode{
 private:
 	int number;
